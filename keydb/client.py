@@ -79,7 +79,7 @@ class KeyDB(StrictRedis):
                 command_list=(cmd_str, value)
                 yield key, value
 
-       def get_cmd_queue(dict):
+        def get_cmd_queue(dict):
             nonlocal cmd_str
             nonlocal command_list
             cmd_queue=[]
