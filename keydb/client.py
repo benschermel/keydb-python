@@ -1,5 +1,5 @@
 from redis import *
-
+from redis.client import Pipeline as PipelineRedis
 
 class KeyDB(StrictRedis):
 
@@ -35,3 +35,31 @@ class KeyDB(StrictRedis):
         :return:
         """
         return self.execute_command('EXPIREMEMBERAT', key, subkey, timestamp)
+
+
+    def pipeline(self, transaction=True, shard_hint=None):
+        """
+        Return a new pipeline object that can queue multiple commands for
+        later execution. ``transaction`` indicates whether all commands
+        should be executed atomically. Apart from making a group of operations
+        atomic, pipelines are useful for reducing the back-and-forth overhead
+        between the client and server.
+        """
+        return Pipeline(
+            self.connection_pool,
+            self.response_callbacks,
+            transaction,
+            shard_hint)
+
+
+class Pipeline(KeyDB,PipelineRedis):
+    def __init__(self, connection_pool, response_callbacks, transaction,
+                 shard_hint):
+        self.connection_pool = connection_pool
+        self.connection = None
+        self.response_callbacks = response_callbacks
+        self.transaction = transaction
+        self.shard_hint = shard_hint
+
+        self.watching = False
+        self.reset()
